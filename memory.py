@@ -97,10 +97,10 @@ def open_process(pid):
 def open_process_name(name):
     """Gets a handle to the first process found with specified name
     Process names are case sensitive
-    Returns the handle (int), on failure returns None
+    Returns the handle , on failure returns None
 
     Keyword arguments:
-    pid -- process id of process to open (int)
+    pid -- process id of process to open
     """
     handle = open_process(get_pid(name))
     if handle:
@@ -108,6 +108,12 @@ def open_process_name(name):
     return None
 
 def get_pid(name):
+    """Returns the process identifier of a process by name
+    Only returns the first process found, multiple processes are not handled. Yet
+
+    Keyword arguments:
+    name - name of the process to get the pid of
+    """
     for i in psutil.process_iter():
         if i.name() == name:
             return i.pid
@@ -196,11 +202,10 @@ def read_bytes(process_handle, address, length):
 def read_string(process_handle, address, maxlen=1024):
     """Reads a zero terminated string"""
     string = ""
-    length = 0
     for i in range(0, maxlen):
         character = read_byte(process_handle, address+i)
         if 0x20 <= character <= 0x7f or character == 0xD or character == 0xA:
-            string+=chr(character)
+            string += chr(character)
     if string != "":
         return string
     return None
@@ -354,8 +359,8 @@ def resolve_multi_pointer(process_handle, base_address, offset_list):
     offset_list -- a list of offsets (ints)
     """
     resolved_ptr = base_address
-    for i in offset_list:
-        resolved_ptr = read_integer(process_handle, resolved_ptr) + i
+    for offset in offset_list:
+        resolved_ptr = read_integer(process_handle, resolved_ptr) + offset
     return resolved_ptr
 
 

@@ -23,6 +23,7 @@ class Region(Structure):
     State
     protect
     Type"""
+
     _fields_ = [
         ("BaseAddress", c_void_p),
         ("AllocationBase", c_void_p),
@@ -40,6 +41,12 @@ class Region(Structure):
         buffer = read_bytes(
             process_handle, self.BaseAddress, self.RegionSize)
         return buffer
+
+    def dealloc(self, process_handle):
+        """Frees this memory region from the process"""
+        virtual_free(process_handle, self.BaseAddress)
+
+
 
 __VirtualQuery__ = WinDLL('kernel32', use_last_error=True).VirtualQueryEx
 __VirtualQuery__.argtypes = [HANDLE, LPCVOID, POINTER(Region), c_size_t]
